@@ -92,9 +92,12 @@ exports.login = async (req, res) => {
       (err, token) => {
         if (err) throw err;
 
+        //deconstruct the user
+        const { _id, name, email, role } = user;
         // send response to frontend
         res.status(200).json({
           token,
+          user: { _id, name, email, role },
         });
       }
     );
@@ -104,4 +107,36 @@ exports.login = async (req, res) => {
       message: "Server Error",
     });
   }
+};
+
+//Custom middleware
+
+// login check
+exports.isLogin = async (req, res, next) => {
+  const token = req.header("token");
+  if (!token)
+    return res
+      .status(401)
+      .json({ message: "Auth Error, cannot find any token !" });
+
+  jwt.verify(token, process.env.SECRETE, (err, user) => {
+    if (err) {
+      //If error send Forbidden (403)
+      console.log("ERROR: Could not connect to the protected route");
+      res.sendStatus(403);
+    } else {
+      req.profile = user;
+    }
+  });
+  next();
+};
+
+// Admin check
+exports.isAdmin = (req, res, next) => {
+  if (req.body.role === 0 || req.profile.role === null) {
+    return res.status(403).json({
+      error: "You are not Admin, ACCESS DENIED",
+    });
+  }
+  next();
 };

@@ -9,6 +9,7 @@ const cors = require("cors");
 
 //import routes
 const authRoutes = require("./routes/Auth");
+const userRoutes = require("./routes/User");
 
 // environment variable
 require("dotenv").config();
@@ -25,10 +26,14 @@ mongoose
   });
 
 // middle wares
-app.use(express.json());
+// middle wares
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(cors());
 
 //my routes
 app.use("/api", authRoutes);
+app.use("/api", userRoutes);
 
 // Port
 const port = process.env.PORT || 8000;

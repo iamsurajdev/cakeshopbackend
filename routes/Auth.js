@@ -3,7 +3,7 @@ var router = express.Router();
 
 const { check, validationResult } = require("express-validator");
 
-const { register, login } = require("../controllers/Auth");
+const { register, login, isAdmin, isLogin } = require("../controllers/Auth");
 
 // Register route
 router.post(
@@ -29,5 +29,10 @@ router.post(
   ],
   login
 );
+
+// just a testing route
+// router.get("/testroute", isLogin, (req, res) => {
+//   res.json(req.profile);
+// });
 
 module.exports = router;
