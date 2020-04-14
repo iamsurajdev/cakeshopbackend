@@ -124,8 +124,6 @@ exports.isLogin = async (req, res, next) => {
       //If error send Forbidden (403)
       console.log("ERROR: Could not connect to the protected route");
       res.sendStatus(403);
-    } else {
-      req.profile = user;
     }
   });
   next();
@@ -133,7 +131,7 @@ exports.isLogin = async (req, res, next) => {
 
 // Admin check
 exports.isAdmin = (req, res, next) => {
-  if (req.body.role === 0 || req.profile.role === null) {
+  if (req.profile.role === 0 || req.profile.role === null) {
     return res.status(403).json({
       error: "You are not Admin, ACCESS DENIED",
     });
