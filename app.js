@@ -10,6 +10,8 @@ const cors = require("cors");
 //import routes
 const authRoutes = require("./routes/Auth");
 const userRoutes = require("./routes/User");
+const categoryRoutes = require("./routes/Category");
+const productRoutes = require("./routes/Product");
 
 // environment variable
 require("dotenv").config();
@@ -34,6 +36,8 @@ app.use(cors());
 //my routes
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
+app.use("/api", categoryRoutes);
+app.use("/api", productRoutes);
 
 // Port
 const port = process.env.PORT || 8000;
