@@ -3,7 +3,13 @@ var router = express.Router();
 
 const { check, validationResult } = require("express-validator");
 
-const { register, login, isAdmin, isLogin } = require("../controllers/Auth");
+const {
+  register,
+  login,
+  logout,
+  isAdmin,
+  isLogin,
+} = require("../controllers/Auth");
 
 // Register route
 router.post(
@@ -29,6 +35,8 @@ router.post(
   ],
   login
 );
+
+router.get("/logout", logout);
 
 // just a testing route
 // router.get("/testroute", isLogin, (req, res) => {

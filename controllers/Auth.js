@@ -109,6 +109,13 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.logout = (req, res) => {
+  res.clearCookie("token");
+  res.json({
+    message: "User Logout successfully.",
+  });
+};
+
 //Custom middleware
 
 // login check
