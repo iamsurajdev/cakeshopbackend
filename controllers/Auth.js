@@ -1,7 +1,19 @@
 const User = require("../models/User");
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
-var jwt = require("jsonwebtoken");
+var JWT = require("jsonwebtoken");
+
+signToken = (user) => {
+  return JWT.sign(
+    {
+      iss: "surajbiswas",
+      sub: user.id,
+      iat: new Date().getTime(), // current time
+      exp: new Date().setDate(new Date().getDate() + 1), // current time + 1 day ahead
+    },
+    process.env.SECRETE
+  );
+};
 
 exports.register = async (req, res) => {
   const errors = validationResult(req);
@@ -25,22 +37,28 @@ exports.register = async (req, res) => {
 
     //start saving to the database
     user = new User({
-      name,
-      email,
-      password,
+      method: "local",
+      local: {
+        email: email,
+        password: password,
+      },
+      name: name,
     });
 
     //hashing the password
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    user.local.password = await bcrypt.hash(password, salt);
 
     //data saved
     await user.save();
 
+    const token = signToken(user);
+
     res.json({
       name: user.name,
-      email: user.email,
+      email: user.local.email,
       id: user._id,
+      token: token,
     });
   } catch (err) {
     console.log(err.message);
@@ -62,7 +80,7 @@ exports.login = async (req, res) => {
   // find user in DB
   try {
     let user = await User.findOne({
-      email,
+      "local.email": email,
     });
 
     // if user not found
@@ -71,42 +89,40 @@ exports.login = async (req, res) => {
         message: "User Not Exist",
       });
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.local.password);
     if (!isMatch)
       return res.status(400).json({
         message: "Incorrect Password !",
       });
 
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
+    const token = signToken(user);
 
-    jwt.sign(
-      payload,
-      process.env.SECRETE,
-      {
-        expiresIn: 999999,
-      },
-      (err, token) => {
-        if (err) throw err;
-
-        //deconstruct the user
-        const { _id, name, email, role } = user;
-        // send response to frontend
-        res.status(200).json({
-          token,
-          user: { _id, name, email, role },
-        });
-      }
-    );
+    res.json({
+      name: user.name,
+      email: user.local.email,
+      id: user._id,
+      token: token,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({
       message: "Server Error",
     });
   }
+};
+
+exports.googleLogin = async (req, res, next) => {
+  // Generate token
+  console.log("got here");
+  const token = signToken(req.user);
+  res.status(200).json({ token });
+};
+
+exports.facebookLogin = async (req, res, next) => {
+  // Generate token
+  console.log("got here");
+  const token = signToken(req.user);
+  res.status(200).json({ token });
 };
 
 exports.logout = (req, res) => {
@@ -117,24 +133,6 @@ exports.logout = (req, res) => {
 };
 
 //Custom middleware
-
-// login check
-exports.isLogin = async (req, res, next) => {
-  const token = req.header("token");
-  if (!token)
-    return res
-      .status(401)
-      .json({ message: "Auth Error, cannot find any token !" });
-
-  jwt.verify(token, process.env.SECRETE, (err, user) => {
-    if (err) {
-      //If error send Forbidden (403)
-      console.log("ERROR: Could not connect to the protected route");
-      res.sendStatus(403);
-    }
-  });
-  next();
-};
 
 // Admin check
 exports.isAdmin = (req, res, next) => {

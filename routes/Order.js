@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { isLogin, isAdmin } = require("../controllers/auth");
+const passport = require("passport");
+const passportConf = require("../passport");
+
+const { isAdmin } = require("../controllers/auth");
 const { getUserById, pushOrderInPurchaseList } = require("../controllers/user");
 const { updateStock } = require("../controllers/product");
+const isLogin = passport.authenticate("jwt", { session: false });
 
 const {
   getOrderById,

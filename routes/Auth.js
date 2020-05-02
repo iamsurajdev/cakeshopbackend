@@ -1,5 +1,7 @@
 var express = require("express");
 var router = express.Router();
+const passport = require("passport");
+const passportConf = require("../passport");
 
 const { check, validationResult } = require("express-validator");
 
@@ -7,9 +9,15 @@ const {
   register,
   login,
   logout,
-  isAdmin,
-  isLogin,
+  googleLogin,
+  facebookLogin,
 } = require("../controllers/Auth");
+
+const isLogin = passport.authenticate("jwt", { session: false });
+const googleToken = passport.authenticate("googleToken", { session: false });
+const facebookToken = passport.authenticate("facebookToken", {
+  session: false,
+});
 
 // Register route
 router.post(
@@ -36,11 +44,15 @@ router.post(
   login
 );
 
+router.post("/oauth/google", googleToken, googleLogin);
+
+router.post("/oauth/facebook", facebookToken, facebookLogin);
+
 router.get("/logout", logout);
 
 // just a testing route
-// router.get("/testroute", isLogin, (req, res) => {
-//   res.json(req.profile);
-// });
+router.get("/testroute", isLogin, (req, res) => {
+  res.json(req.user);
+});
 
 module.exports = router;

@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const passport = require("passport");
+const passportConf = require("../passport");
 
 const {
   getProductById,
@@ -11,8 +13,10 @@ const {
   getAllProducts,
   getAllUniqueCategories,
 } = require("../controllers/Product");
-const { isLogin, isAdmin } = require("../controllers/Auth");
+
+const { isAdmin } = require("../controllers/Auth");
 const { getUserById } = require("../controllers/User");
+const isLogin = passport.authenticate("jwt", { session: false });
 
 //params
 router.param("userId", getUserById);
