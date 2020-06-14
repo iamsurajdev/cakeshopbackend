@@ -83,6 +83,8 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log("got to the face book ");
+
         // Should have full user profile over here
         console.log("profile", profile);
         console.log("accessToken", accessToken);

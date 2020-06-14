@@ -7,6 +7,7 @@ const { check, validationResult } = require("express-validator");
 
 const {
   register,
+  isAdmin,
   login,
   logout,
   googleLogin,
@@ -46,13 +47,13 @@ router.post(
 
 router.post("/oauth/google", googleToken, googleLogin);
 
-router.post("/oauth/facebook", facebookToken, facebookLogin);
+router.post("/facebook", facebookToken, facebookLogin);
 
 router.get("/logout", logout);
 
 // just a testing route
-router.get("/testroute", isLogin, (req, res) => {
-  res.json(req.user);
+router.get("/testroute", isLogin, isAdmin, (req, res) => {
+  res.json("Tera baap hu mader chood");
 });
 
 module.exports = router;

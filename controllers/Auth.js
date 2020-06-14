@@ -18,19 +18,23 @@ signToken = (user) => {
 exports.register = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
-      errors: errors.array()[0].msg,
+    // return res.status(400).json({
+    //   errors: errors.array()[0].msg,
+    // });
+    return res.json({
+      error: errors.array()[0].msg,
     });
   }
 
   const { name, email, password } = req.body;
   try {
     //isUser exist Validation
-    let user = await User.findOne({
-      email,
-    });
+    let user = await User.findOne({ "local.email": email });
     if (user) {
-      return res.status(400).json({
+      // return res.status(400).json({
+      //   msg: "User Already Exists with this email",
+      // });
+      return res.json({
         msg: "User Already Exists with this email",
       });
     }
@@ -70,8 +74,11 @@ exports.login = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
-      errors: errors.array()[0].msg,
+    // return res.status(400).json({
+    //   errors: errors.array()[0].msg,
+    // });
+    return res.json({
+      error: errors.array()[0].msg,
     });
   }
   //  destructor the email and password
@@ -84,23 +91,30 @@ exports.login = async (req, res) => {
     });
 
     // if user not found
-    if (!user)
-      return res.status(400).json({
-        message: "User Not Exist",
+    if (!user) {
+      // return res.status(400).json({
+      //   msg: "User Not Exist",
+      // });
+      return res.json({
+        msg: "User Not Exist",
       });
-
+    }
     const isMatch = await bcrypt.compare(password, user.local.password);
-    if (!isMatch)
-      return res.status(400).json({
-        message: "Incorrect Password !",
+    if (!isMatch) {
+      // return res.status(400).json({
+      //   msg: "Incorrect Password !",
+      // });
+      return res.json({
+        msg: "Incorrect Password !",
       });
-
+    }
     const token = signToken(user);
 
     res.json({
       name: user.name,
       email: user.local.email,
       id: user._id,
+      role: user.role,
       token: token,
     });
   } catch (err) {
@@ -122,7 +136,14 @@ exports.facebookLogin = async (req, res, next) => {
   // Generate token
   console.log("got here");
   const token = signToken(req.user);
-  res.status(200).json({ token });
+  user = req.user;
+  res.status(200).json({
+    name: user.name,
+    email: user.local.email,
+    id: user._id,
+    role: user.role,
+    token: token,
+  });
 };
 
 exports.logout = (req, res) => {
@@ -136,7 +157,7 @@ exports.logout = (req, res) => {
 
 // Admin check
 exports.isAdmin = (req, res, next) => {
-  if (req.profile.role === 0 || req.profile.role === null) {
+  if (req.user.role === 0 || req.user.role === null) {
     return res.status(403).json({
       error: "You are not Admin, ACCESS DENIED",
     });
