@@ -53,7 +53,7 @@ router.get("/logout", logout);
 
 // just a testing route
 router.get("/testroute", isLogin, isAdmin, (req, res) => {
-  res.json("Tera baap hu mader chood");
+  res.json("test success");
 });
 
 module.exports = router;
