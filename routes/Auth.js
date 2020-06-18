@@ -47,7 +47,7 @@ router.post(
 
 router.post("/oauth/google", googleToken, googleLogin);
 
-router.post("/facebook", facebookToken, facebookLogin);
+router.post("/oauth/facebook", facebookToken, facebookLogin);
 
 router.get("/logout", logout);
 

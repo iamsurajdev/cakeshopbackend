@@ -58,7 +58,7 @@ passport.use(
           method: "google",
           google: {
             id: profile.id,
-            email: profile.emails[0].value,
+            email: profile.emails[0].value ? profile.emails[0].value : null,
           },
           name: profile.displayName,
         });
