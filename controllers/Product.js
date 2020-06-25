@@ -25,7 +25,7 @@ exports.createProduct = (req, res) => {
 
   form.parse(req, (err, fields, file) => {
     if (err) {
-      return res.status(400).json({
+      return res.json({
         error: "Problem with image",
       });
     }
@@ -134,13 +134,13 @@ exports.updateProduct = (req, res) => {
 
 //product listing
 exports.getAllProducts = (req, res) => {
-  let limit = req.query.limit ? parseInt(req.query.limit) : 8;
-  let shortBy = req.query.limit ? parseInt(req.query.limit) : "_id";
+  // let limit = req.query.limit ? parseInt(req.query.limit) : 8;
+  // let shortBy = req.query.limit ? parseInt(req.query.limit) : "_id";
   Product.find()
-    .select("-photo")
-    .populate("category")
-    .sort([[shortBy, "asc"]])
-    .limit(limit)
+    // .select("-photo")
+    // .populate("category")
+    // .sort([[shortBy, "asc"]])
+    // .limit(limit)
     .exec((err, products) => {
       if (err) {
         return res.status(400).json({
